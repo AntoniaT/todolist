@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TODO list</title>
+</head>
+<body>
+    <h1>My to do list:</h1>
+    <form name="todolist">
+        <label>Add new tasks: <input type="text" name="task"></label>
+        <label>When: <input type="number" name="time"></label>
+
+        <input type="submit" name="submit" value="add task">
+    </form>
+    <main></main>
+    <template>
+        <article>
+        <h3>TASK</h3>
+        <p>TASK</p>
+        </article>
+    </template>
+<script>
+    const parent = document.querySelector("main");
+    const template = document.querySelector("template").content;
+    
+/*     const otherTask = {
+    task: "cleaning",
+    time: 16
+    }; */
+
+// now I take "myTask" as an argument to make this function reusable, so that "myTask" can be
+// filled in by any input
+   function post (myTask){
+      fetch("https://allpets-7f82.restdb.io/rest/todo-list", {
+          method: "post",
+          body: JSON.stringify(myTask),
+          headers:     {
+          "Content-Type": "application/json; charset=utf-8",
+          "x-apikey": "5c7cef07cac6621685acbaec",
+          "cache-control": "no-cache"
+  }
+      })
+      .then(res => res.json())
+      .then(data =>{
+  //        console.log(data);
+          showTasks(data);
+      });
+  }
+ 
+  function get(){
+    fetch("https://allpets-7f82.restdb.io/rest/todo-list", {
+    method: "get",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "x-apikey": "5c7cef07cac6621685acbaec",
+      "cache-control": "no-cache"
+  }
+})
+  .then(res => res.json())
+  .then(data => {
+  //    console.log(data)
+      data.forEach(showTasks);
+  });
+  }
+
+  function showTasks(item){
+    const clone = template.cloneNode(true);
+    clone.querySelector("h3").textContent = item.task;
+    clone.querySelector("p").textContent = item.time;
+
+    parent.appendChild(clone);
+  }
+  get();
+
+    
+  const form = document.querySelector("form");
+  form.addEventListener("submit", e =>{
+      e.preventDefault();
+      console.log("submitted");
+      const addedTask = {
+          task: form.elements.task.value,
+          when: form.elements.time.value
+      };
+      console.log(addedTask);
+
+      post(addedTask);
+  }); 
+</script>
+</body>
+</html>
